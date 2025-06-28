@@ -4,17 +4,14 @@ title = CalorEyes
 
 source.main = main.py
 
-requirements = python3,kivy,plyer,requests,python-dotenv
-
-android.permissions = INTERNET,CAMERA,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
-
-android.api = 33
+android.api = 31
 android.minapi = 21
-android.sdk = 24
 android.ndk = 25b
 android.ndk_api = 21
+android.permissions = INTERNET,CAMERA,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE
+requirements = python3,kivy,plyer,requests,python-dotenv
 
-android.arch = armeabi-v7a
+android.arch = arm64-v8a
 
 # Camera will be used
 android.manifest.intent_filters = android.hardware.camera
