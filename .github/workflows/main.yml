@@ -28,9 +28,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            python3-pip python3-setuptools python3-virtualenv git zip unzip openjdk-11-jdk \
-            adb curl build-essential autoconf automake libtool pkg-config zlib1g-dev \
-            libncurses-dev libffi-dev libssl-dev wget unzip
+          python3-pip python3-setuptools python3-virtualenv git zip unzip openjdk-11-jdk \
+          adb curl build-essential autoconf automake libtool pkg-config zlib1g-dev \
+          libncurses-dev libffi-dev libssl-dev wget unzip
 
       - name: Install Buildozer, Cython and python-dotenv
         run: |
