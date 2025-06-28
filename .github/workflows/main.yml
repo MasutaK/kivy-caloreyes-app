@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ANDROID_SDK_ROOT: ${{ runner.temp }}/android-sdk
-      PATH: ${{ runner.temp }}/android-sdk/cmdline-tools/latest/bin:${{ runner.temp }}/android-sdk/platform-tools:${{ runner.temp }}/android-sdk/build-tools/33.0.2:$PATH
+      ANDROID_SDK_ROOT: /home/runner/android-sdk
+      PATH: /home/runner/android-sdk/cmdline-tools/latest/bin:/home/runner/android-sdk/platform-tools:/home/runner/android-sdk/build-tools/33.0.2:$PATH
 
     steps:
       - name: Checkout repository
@@ -55,9 +55,9 @@ jobs:
         run: |
           source venv/bin/activate
           buildozer android debug
-          
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: caloreyes-apk
+          name: caloreyese-apk
           path: bin/*.apk
