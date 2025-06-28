@@ -1,4 +1,4 @@
-name: Build APK with Buildozer (2-step SDK + build-tools 29.0.0)
+name: Build APK with Buildozer (fix native macro)
 
 on:
   push:
@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Create .env file with secrets
+      - name: Create .env from secrets
         env:
           HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
           NUTRITIONIX_APP_ID: ${{ secrets.NUTRITIONIX_APP_ID }}
@@ -28,40 +28,35 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-          python3-pip python3-setuptools python3-virtualenv git zip unzip openjdk-11-jdk \
-          adb curl build-essential autoconf automake libtool pkg-config zlib1g-dev \
-          libncurses-dev libffi-dev libssl-dev wget unzip
+            python3-pip python3-setuptools python3-virtualenv git zip unzip openjdk-11-jdk \
+            adb curl build-essential autoconf automake libtool pkg-config zlib1g-dev \
+            libncurses-dev libffi-dev libssl-dev wget unzip
 
-      - name: Install Buildozer, Cython and python-dotenv
+      - name: Install Python tools
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install buildozer cython python-dotenv
-          python3 -m pip install --upgrade setuptools wheel
-          python3 -m pip install --upgrade cython
 
-      - name: Setup Java environment
+      - name: Set JAVA_HOME
         run: echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
 
-      - name: Initial Buildozer build (to download SDK)
+      - name: Trigger first Buildozer build (download SDK)
         run: buildozer android debug || true
 
-      - name: Install build-tools 29.0.0 in SDK
+      - name: Install Android build-tools 29.0.0 manually
         run: |
-          ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;29.0.0"
+          ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager \
+            --sdk_root=$HOME/.buildozer/android/platform/android-sdk "build-tools;29.0.0"
 
-      - name: Accept Android SDK licenses
+      - name: Accept SDK licenses
         run: |
-          yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
-      
-      - name: Fix LT_SYS_SYMBOL_USCORE macro (libtoolize)
-        run: |
-          libtoolize --force --copy
-          aclocal
-      
-      - name: Final Build APK with Buildozer
+          yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager \
+            --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
+
+      - name: Final Build with Buildozer
         run: buildozer android debug
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: caloreyes-apk
