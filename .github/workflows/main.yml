@@ -29,10 +29,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-          python3-pip python3-setuptools python3-virtualenv git zip unzip openjdk-11-jdk \
-          android-sdk adb curl build-essential autoconf automake libtool pkg-config zlib1g-dev \
-          libncurses-dev libffi-dev libssl-dev
-          
+            python3-pip python3-setuptools python3-virtualenv git zip unzip openjdk-11-jdk \
+            adb curl build-essential autoconf automake libtool pkg-config zlib1g-dev \
+            libncurses-dev libffi-dev libssl-dev wget unzip
+
       - name: Install Buildozer and Cython
         run: |
           python3 -m pip install --upgrade pip
@@ -40,6 +40,26 @@ jobs:
 
       - name: Setup Java environment
         run: echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
+
+      - name: Download and install Android SDK command line tools
+        run: |
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip
+          rm cmdline-tools.zip
+          mv cmdline-tools latest
+
+      - name: Set Android SDK environment variables
+        run: |
+          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
+
+      - name: Accept licenses and install SDK packages
+        run: |
+          yes | sdkmanager --sdk_root=$HOME/android-sdk --licenses
+          sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
       - name: Build APK with Buildozer
         run: buildozer android debug
