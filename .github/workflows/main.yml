@@ -61,6 +61,11 @@ jobs:
           yes | sdkmanager --sdk_root=$HOME/android-sdk --licenses
           sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
+      - name: Export Android SDK tools paths
+        run: |
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "PATH=$HOME/android-sdk/platform-tools:$HOME/android-sdk/build-tools/33.0.2:$PATH" >> $GITHUB_PATH
+
       - name: Build APK with Buildozer
         run: buildozer android debug
 
