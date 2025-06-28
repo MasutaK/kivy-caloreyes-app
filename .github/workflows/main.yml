@@ -52,7 +52,12 @@ jobs:
       - name: Accept Android SDK licenses
         run: |
           yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses
-
+      
+      - name: Fix LT_SYS_SYMBOL_USCORE macro (libtoolize)
+        run: |
+          libtoolize --force --copy
+          aclocal
+      
       - name: Final Build APK with Buildozer
         run: buildozer android debug
 
