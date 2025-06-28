@@ -34,14 +34,11 @@ jobs:
           pip install --upgrade pip setuptools Cython
           pip install buildozer
 
-      - name: Prepare environment
+      - name: Prepare .env file
         run: |
-          echo "Creating .env file from secrets"
-          cat <<EOF > .env
-HUGGINGFACE_TOKEN=${HUGGINGFACE_TOKEN}
-NUTRITIONIX_APP_ID=${NUTRITIONIX_APP_ID}
-NUTRITIONIX_API_KEY=${NUTRITIONIX_API_KEY}
-EOF
+          echo "HUGGINGFACE_TOKEN=${HUGGINGFACE_TOKEN}" > .env
+          echo "NUTRITIONIX_APP_ID=${NUTRITIONIX_APP_ID}" >> .env
+          echo "NUTRITIONIX_API_KEY=${NUTRITIONIX_API_KEY}" >> .env
 
       - name: Initialize Buildozer (if needed)
         run: |
