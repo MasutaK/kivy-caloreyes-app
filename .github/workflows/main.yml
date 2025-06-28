@@ -1,4 +1,4 @@
-name: Build APK
+name: Build APK with Buildozer
 
 on:
   push:
@@ -10,54 +10,40 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      ANDROID_SDK_ROOT: /home/runner/android-sdk
-      PATH: /home/runner/android-sdk/cmdline-tools/latest/bin:/home/runner/android-sdk/platform-tools:/home/runner/android-sdk/build-tools/33.0.2:$PATH
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-
-      - name: Install dependencies (Java, wget, unzip, tar)
-        run: sudo apt-get update && sudo apt-get install -y openjdk-17-jdk wget unzip tar
-
-      - name: Download and setup Android SDK command line tools
+      - name: Create .env file with secrets
+        env:
+          HUGGINGFACE_TOKEN: ${{ secrets.HUGGINGFACE_TOKEN }}
+          NUTRITIONIX_APP_ID: ${{ secrets.NUTRITIONIX_APP_ID }}
+          NUTRITIONIX_API_KEY: ${{ secrets.NUTRITIONIX_API_KEY }}
         run: |
-          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
-          mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
+          echo "HUGGINGFACE_TOKEN=$HUGGINGFACE_TOKEN" > .env
+          echo "NUTRITIONIX_APP_ID=$NUTRITIONIX_APP_ID" >> .env
+          echo "NUTRITIONIX_API_KEY=$NUTRITIONIX_API_KEY" >> .env
+          cat .env
 
-      - name: Install Android SDK packages and accept licenses
+      - name: Install system dependencies
         run: |
-          yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
-          sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-setuptools python3-virtualenv git zip unzip openjdk-11-jdk \
+          android-sdk adb curl build-essential autoconf automake libtool pkg-config zlib1g-dev libncurses5 libncurses5-dev libffi-dev libssl-dev
 
-      - name: Verify AIDL installation
-        run: ls $ANDROID_SDK_ROOT/build-tools/33.0.2/aidl
-
-      - name: Create .env file from secret
-        run: echo "${{ secrets.ENV_FILE }}" > .env
-
-      - name: Install buildozer and dependencies
+      - name: Install Buildozer and Cython
         run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install buildozer cython
+          python3 -m pip install --upgrade pip
+          python3 -m pip install buildozer cython python-dotenv
+
+      - name: Setup Java environment
+        run: echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
 
       - name: Build APK with Buildozer
-        run: |
-          source venv/bin/activate
-          buildozer android debug
+        run: buildozer android debug
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: caloreyese-apk
+          name: caloreyes-apk
           path: bin/*.apk
