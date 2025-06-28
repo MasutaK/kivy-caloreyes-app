@@ -43,6 +43,11 @@ jobs:
       - name: Trigger first Buildozer build (download SDK)
         run: buildozer android debug || true
 
+      - name: Patch configure.ac to allow LT_SYS_SYMBOL_USCORE
+        run: |
+          find .buildozer -name configure.ac -exec \
+          sed -i '1im4_pattern_allow([LT_SYS_SYMBOL_USCORE])' {} +
+
       - name: Install Android build-tools 29.0.0 manually
         run: |
           ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager \
