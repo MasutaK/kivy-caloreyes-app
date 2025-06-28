@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Environnement virtuel
+venv/
+env/
+.venv/
+.env/
+
+# Fichiers de configuration sensibles
+.env
+
+# Buildozer
+.buildozer/
+bin/
+*.apk
+*.aab
+
+# Fichiers temporaires et logs
+*.log
+*.tmp
+*.swp
+*.swo
+
+# PyCharm
+.idea/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
