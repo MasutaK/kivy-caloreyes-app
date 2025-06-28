@@ -1,0 +1,41 @@
+name: Build APK CalorEyes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Generate .env file
+      run: |
+        echo "HUGGINGFACE_TOKEN=${{ secrets.HUGGINGFACE_TOKEN }}" >> .env
+        echo "NUTRITIONIX_APP_ID=${{ secrets.NUTRITIONIX_APP_ID }}" >> .env
+        echo "NUTRITIONIX_API_KEY=${{ secrets.NUTRITIONIX_API_KEY }}" >> .env
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-11-jdk zip unzip
+        python -m pip install --upgrade pip cython buildozer
+
+    - name: Build APK
+      run: |
+        buildozer android release
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: caloreyese-apk
+        path: bin/*.apk
